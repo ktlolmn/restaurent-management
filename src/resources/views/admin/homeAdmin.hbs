@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Line Chart with Data Labels</title>
+    <style>
+        .home-oder {
+            display: flex;
+            position: relative;
+            justify-content: space-between;
+            background-color: rgba(95, 158, 160, 0.692);
+            margin-left: 270px;
+            margin-top: 40px;
+            max-height: 670px;
+            height: 570px;
+            padding: 0;
+            border-radius: 25px;
+            overflow: hidden;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</head>
+
+<body>
+    <div>
+        <div class="home-oder">
+            <canvas data-histories="{{histories}}" id="myLineChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Lấy thẻ canvas và context
+        var ctx = document.getElementById('myLineChart').getContext('2d');
+        var data = [document.getElementById('myLineChart').dataset.histories];
+        var vene = Array(12).fill(0);
+
+        data = JSON.parse(data);
+        data.forEach(d => {
+            const dataTime = new Date(d.updatedAt);
+            const monthIndex = dataTime.getMonth();
+            vene[monthIndex] += parseInt(d.bill);
+        });
+
+        // Mảng 'vene' chứa tổng cho từng tháng từ tháng 1 đến tháng 12
+        console.log(vene);
+
+        var data = {
+            labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+            datasets: [{
+                label: 'Doanh thu',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(255, 0, 0, 1)', // Màu đỏ
+                borderWidth: 1,
+                data: vene,
+            }]
+        };
+
+        var options = {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: function (value, context) {
+                        return value.toLocaleString(); // Định dạng giá trị số
+                    },
+                    display: function (context) {
+                        return context.dataset.data[context.dataIndex] !== 0; // Hiển thị nhãn chỉ khi giá trị khác 0
+                    }
+                }
+            }
+        };
+
+        var myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: options
+        });
+
+    </script>
+</body>
+
+</html>
